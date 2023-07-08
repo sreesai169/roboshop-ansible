@@ -1,0 +1,26 @@
+
+#func_print_head "Update Passwords in System Service file"
+#sed -i -e "s|rabbitmq_appuser_password|${rabbitmq_appuser_password}|" ${script_path}/payment.service &>>$log_file
+#func_stat_check $?
+
+
+- name: Install Python
+  ansible.builtin.yum:
+    name:
+      - python36
+      - gcc
+      - python3-devel
+    state: installed
+
+- name : Include app pre-requirements
+  ansible.builtin.import_tasks:
+    file: app_prereq.yml
+
+- name: Install Python Dependencies
+  ansible.builtin.shell: pip3.6 install -r requirements.txt
+  args:
+    chdir: /app
+
+- name : Include SystemD setup
+  ansible.builtin.import_tasks:
+    file: systemd_setup.yml
